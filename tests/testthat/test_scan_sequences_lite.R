@@ -180,6 +180,21 @@ test_that("empty result returns the documented shape", {
   )
 })
 
+test_that("empty GRanges result retains the documented metadata columns", {
+  skip_if_not_installed("GenomicRanges")
+  m <- list(create_motif("AAAAAA", name = "polyA"))
+  seqs <- DNAStringSet(c(only = paste(rep("G", 100), collapse = "")))
+  hits <- scan_sequences_lite(m, seqs, pvalue = 1e-4,
+                              return.granges = TRUE)
+  expect_s4_class(hits, "GRanges")
+  expect_equal(length(hits), 0L)
+  expect_identical(
+    colnames(S4Vectors::mcols(hits)),
+    c("motif", "motif.i", "sequence.i", "score", "score.pct", "match",
+      "pvalue")
+  )
+})
+
 })  ## end suppressMessages
 
 test_that("scan_sequences_lite runs on RNA motifs and sequences", {

@@ -63,7 +63,8 @@ co-occurring sequences are tagged with NA p- and q-values
 (not tested). Default \code{1L} (only test pairs that co-occur at
 least once).}
 
-\item{pseudocount}{\code{numeric(1)}. Added to every cell of the 2x2
+\item{pseudocount}{\code{numeric(1)}. A non-negative whole number added to
+every cell of the 2x2
 contingency before the Fisher test (matches the convention from
 \code{\link[=enrich_motifs_lite]{enrich_motifs_lite()}}). Default \code{0L}.}
 

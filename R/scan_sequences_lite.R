@@ -265,12 +265,16 @@ empty_scan2_result <- function(seq.names, sequences, return.granges) {
     stringsAsFactors = FALSE
   )
   if (!use_granges(return.granges)) return(empty_df)
-  GenomicRanges::GRanges(
+  gr <- GenomicRanges::GRanges(
     seqnames = character(0),
     ranges   = IRanges::IRanges(),
     strand   = character(0),
     seqlengths = structure(width(sequences), names = seq.names)
   )
+  S4Vectors::mcols(gr) <- empty_df[, c("motif", "motif.i", "sequence.i",
+                                       "score", "score.pct", "match", "pvalue"),
+                                   drop = FALSE]
+  gr
 }
 
 `%||%` <- function(x, y) if (is.null(x)) y else x

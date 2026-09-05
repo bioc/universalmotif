@@ -58,6 +58,17 @@ test_that("view_motifs_lite rejects mixed alphabets", {
   expect_error(view_motifs_lite(list(dna, rna)), "alphabet")
 })
 
+test_that("all motifs must contain the requested multifreq matrix", {
+  train <- Biostrings::DNAStringSet(rep("ACGTA", 20))
+  m2 <- suppressMessages(create_motif(train, add.multifreq = 2,
+                                      pseudocount = 1))
+  m3 <- suppressMessages(create_motif(train, add.multifreq = 3,
+                                      pseudocount = 1))
+  expect_error(view_motifs_lite(list(m2, m3), use.freq = 2),
+               "not all motifs have corresponding multifreq matrix",
+               fixed = TRUE)
+})
+
 test_that("view_motifs_lite dedup.names default rewrites duplicates", {
   m1 <- create_motif("CACGTG", name = "same")
   m2 <- create_motif("TGACGT", name = "same")

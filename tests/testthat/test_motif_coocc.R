@@ -268,3 +268,54 @@ test_that("no.overlaps.by is validated", {
     "should be one of"
   )
 })
+
+test_that("fractional pseudocounts are rejected", {
+  motifs <- list(make_fixed("AAAAAAAAAAAA", "M1"),
+                 make_fixed("CCCCCCCCCCCC", "M2"))
+  hits <- fake_hits(list(c(1L, 2L), c(1L, 3L)))
+  expect_error(
+    motif_coocc(motifs, hits = hits, n.sequences = 4L,
+                pseudocount = 0.5),
+    "whole number"
+  )
+})
+
+test_that("integer pseudocount p-values match Fisher's exact test", {
+  motifs <- list(make_fixed("AAAAAAAAAAAA", "M1"),
+                 make_fixed("CCCCCCCCCCCC", "M2"))
+  hits <- fake_hits(list(c(1L, 2L), c(1L, 3L)))
+  co <- motif_coocc(motifs, hits = hits, n.sequences = 4L,
+                    pseudocount = 1L)
+  tbl <- matrix(c(co$both, co$b_only, co$a_only, co$neither), nrow = 2L) + 1L
+  expected <- stats::fisher.test(tbl, alternative = "greater")$p.value
+  expect_equal(co$pvalue, expected)
+})
+
+test_that("precomputed hit indices are validated against their bounds", {
+  motifs <- list(make_fixed("AAAAAAAAAAAA", "M1"),
+                 make_fixed("CCCCCCCCCCCC", "M2"))
+  bad_motif <- data.frame(motif.i = c(0L, 2L), sequence.i = c(1L, 2L))
+  bad_sequence <- data.frame(motif.i = c(1L, 2L), sequence.i = c(1L, 3L))
+  fractional <- data.frame(motif.i = c(1, 2), sequence.i = c(1, 1.5))
+
+  expect_error(motif_coocc(motifs, hits = bad_motif, n.sequences = 2L),
+               "motif indices outside")
+  expect_error(motif_coocc(motifs, hits = bad_sequence, n.sequences = 2L),
+               "sequence indices outside")
+  expect_error(motif_coocc(motifs, hits = fractional, n.sequences = 2L),
+               "finite integer indices")
+})
+
+test_that("empty spatial hit tables return cleanly without warnings", {
+  motifs <- list(make_fixed("AAAAAAAAAAAA", "M1"),
+                 make_fixed("CCCCCCCCCCCC", "M2"))
+  hits <- data.frame(motif.i = integer(), sequence.i = integer(),
+                     start = integer())
+  expect_no_warning(
+    co <- motif_coocc(motifs, hits = hits, n.sequences = 2L,
+                      max.distance = 5L)
+  )
+  expect_equal(co$both, 0L)
+  expect_equal(co$both.clustered, 0L)
+  expect_true(is.na(co$median.distance))
+})

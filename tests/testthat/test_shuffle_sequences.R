@@ -59,3 +59,9 @@ test_that("seeded shuffle is reproducible at nthreads = 2", {
                           rng.seed = 42)
   expect_equal(as.character(a), as.character(b))
 })
+
+test_that("removed random shuffle method is rejected", {
+  seqs <- Biostrings::DNAStringSet("ACGTACGT")
+  expect_error(shuffle_sequences(seqs, method = "random", k = 2),
+               "Incorrect 'shuffle.method'", fixed = TRUE)
+})

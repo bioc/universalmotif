@@ -192,7 +192,7 @@ view_motifs_lite <- function(motifs, use.type = "ICM", tryRC = TRUE,
       function(x) any(names(x@multifreq) %in% as.character(use.freq)),
       logical(1)
     )
-    if (!any(check_multi))
+    if (!all(check_multi))
       stop("not all motifs have corresponding multifreq matrix")
     mot.mats <- lapply(motifs,
       function(x) x@multifreq[[as.character(use.freq)]])

@@ -102,6 +102,40 @@ test_that("scan_sequences() with multifreq motif on a short sequence gives a fri
 
 })
 
+test_that("multifreq scan coordinates and matches cover the full k-let span", {
+
+  train <- Biostrings::DNAStringSet(rep("ACGT", 20))
+  m <- suppressMessages(create_motif(train, add.multifreq = 2,
+                                     pseudocount = 1))
+  seq <- Biostrings::DNAStringSet("TTACGTAA")
+  hits <- suppressWarnings(scan_sequences(
+    m, seq, use.freq = 2, RC = FALSE, threshold = -1e6,
+    threshold.type = "logodds.abs", calc.pvals = FALSE, verbose = 0
+  ))
+
+  best <- which.max(hits$score)
+  expect_equal(hits$start[best], 3L)
+  expect_equal(hits$stop[best], 6L)
+  expect_equal(hits$match[best], "ACGT")
+  expect_true(all(hits$stop - hits$start + 1L == ncol(m@motif)))
+
+})
+
+test_that("all motifs must contain the requested multifreq matrix", {
+
+  train <- Biostrings::DNAStringSet(rep("ACGTA", 20))
+  m2 <- suppressMessages(create_motif(train, add.multifreq = 2,
+                                      pseudocount = 1))
+  m3 <- suppressMessages(create_motif(train, add.multifreq = 3,
+                                      pseudocount = 1))
+  expect_error(
+    scan_sequences(list(m2, m3), Biostrings::DNAStringSet("ACGTACGTA"),
+                   use.freq = 2, verbose = 0),
+    "not all motifs have correct multifreqs", fixed = TRUE
+  )
+
+})
+
 test_that("scan_sequences() suggests scan_sequences_lite() when arguments are compatible", {
 
   m <- create_motif("ACGTAC")

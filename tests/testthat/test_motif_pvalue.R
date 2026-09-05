@@ -94,3 +94,13 @@ test_that("motif_pvalue gives the same p-value at nthreads = 1 and 2", {
   b <- motif_pvalue(m, scores, nthreads = 2)
   expect_equal(a, b)
 })
+
+test_that("dynamic method accepts use.freq above three with the default method", {
+  train <- Biostrings::DNAStringSet(rep("ACGTAC", 20))
+  m <- suppressMessages(create_motif(train, add.multifreq = 4,
+                                     pseudocount = 1))
+  score <- motif_pvalue(m, pvalue = 1e-3, use.freq = 4)
+  expect_type(score, "double")
+  expect_length(score, 1L)
+  expect_true(is.finite(score))
+})

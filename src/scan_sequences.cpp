@@ -69,7 +69,7 @@ void scan_single_seq_NA(const list_int_t &motif, const vec_int_t &sequence,
     if (tmp >= min_score)
       out.push_back({motif_idx_1based, seq_idx_1based,
                      static_cast<int>(i + 1),
-                     static_cast<int>(i + motif.size()),
+                     static_cast<int>(i + motif.size() + k - 1),
                      tmp});
   }
 
@@ -91,7 +91,7 @@ void scan_single_seq(const list_int_t &motif, const vec_int_t &sequence,
     if (tmp >= min_score)
       out.push_back({motif_idx_1based, seq_idx_1based,
                      static_cast<int>(i + 1),
-                     static_cast<int>(i + motif.size()),
+                     static_cast<int>(i + motif.size() + k - 1),
                      tmp});
   }
 
@@ -256,13 +256,14 @@ list_int_t scan_sequences_cpp_internal(const list_mat_t &score_mats,
 }
 
 vec_str_t get_matches(const list_int_t &res, const vec_str_t &seq_vecs,
-    const list_mat_t &motifs) {
+    const list_mat_t &motifs, const int &k) {
 
   vec_str_t out;
   out.reserve(res[0].size());
 
   for (std::size_t i = 0; i < res[0].size(); ++i) {
-    out.push_back(seq_vecs[res[1][i] - 1].substr(res[2][i] - 1, motifs[res[0][i] - 1].size()));
+    std::size_t span = motifs[res[0][i] - 1].size() + k - 1;
+    out.push_back(seq_vecs[res[1][i] - 1].substr(res[2][i] - 1, span));
   }
 
   return out;
@@ -391,7 +392,7 @@ Rcpp::DataFrame scan_sequences_cpp(const Rcpp::List &score_mats,
   }
   for (std::size_t i = 0; i < motif_sizes.size(); ++i) {
     for (std::size_t j = 0; j < seq_sizes.size(); ++j) {
-      if (seq_sizes[j] < motif_sizes[i]) {
+      if (seq_sizes[j] < motif_sizes[i] + k - 1) {
         Rcpp::stop("Found sequence(s) shorter than the width of the motif(s)");
       }
     }
@@ -405,7 +406,7 @@ Rcpp::DataFrame scan_sequences_cpp(const Rcpp::List &score_mats,
     scores2[i] /= 1000;
   }
 
-  vec_str_t matches = get_matches(res, seq_vecs, score2_mats);
+  vec_str_t matches = get_matches(res, seq_vecs, score2_mats, k);
 
   return Rcpp::DataFrame::create(
         Rcpp::_["motif"] = res[0],

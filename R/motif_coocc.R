@@ -70,7 +70,8 @@
 #'   co-occurring sequences are tagged with NA p- and q-values
 #'   (not tested). Default `1L` (only test pairs that co-occur at
 #'   least once).
-#' @param pseudocount `numeric(1)`. Added to every cell of the 2x2
+#' @param pseudocount `numeric(1)`. A non-negative whole number added to
+#'   every cell of the 2x2
 #'   contingency before the Fisher test (matches the convention from
 #'   [enrich_motifs_lite()]). Default `0L`.
 #' @param self.pairs `logical(1)`. If `TRUE`, include `(i, i)` rows
@@ -151,14 +152,18 @@ motif_coocc <- function(motifs, sequences = NULL,
          call. = FALSE)
   if (!is.null(max.distance) &&
       (!is.numeric(max.distance) || length(max.distance) != 1L ||
-       max.distance < 0L))
+       is.na(max.distance) || !is.finite(max.distance) ||
+       max.distance < 0L || max.distance != floor(max.distance)))
     stop("`max.distance` must be a non-negative integer or NULL",
          call. = FALSE)
-  if (!is.numeric(min.coocc) || length(min.coocc) != 1L || min.coocc < 0L)
+  if (!is.numeric(min.coocc) || length(min.coocc) != 1L ||
+      is.na(min.coocc) || !is.finite(min.coocc) || min.coocc < 0L ||
+      min.coocc != floor(min.coocc))
     stop("`min.coocc` must be a non-negative integer", call. = FALSE)
   if (!is.numeric(pseudocount) || length(pseudocount) != 1L ||
-      pseudocount < 0)
-    stop("`pseudocount` must be a non-negative numeric", call. = FALSE)
+      is.na(pseudocount) || !is.finite(pseudocount) || pseudocount < 0 ||
+      pseudocount != floor(pseudocount))
+    stop("`pseudocount` must be a non-negative whole number", call. = FALSE)
   if (!isTRUEorFALSE(self.pairs))
     stop("`self.pairs` must be a single logical", call. = FALSE)
   if (!isTRUEorFALSE(RC))
@@ -196,11 +201,13 @@ motif_coocc <- function(motifs, sequences = NULL,
     ## Hit-table path -- any alphabet OK.
     if (is.null(n.sequences) ||
         !is.numeric(n.sequences) || length(n.sequences) != 1L ||
-        n.sequences < 1L)
+        is.na(n.sequences) || !is.finite(n.sequences) ||
+        n.sequences < 1L || n.sequences != floor(n.sequences))
       stop("`n.sequences` must be a positive integer when `hits` is ",
            "supplied", call. = FALSE)
     n.sequences <- as.integer(n.sequences)
-    hits <- coerce_hits(hits, motifs, mot.names, need.start = !is.null(max.distance))
+    hits <- coerce_hits(hits, motifs, mot.names, n.sequences,
+                        need.start = !is.null(max.distance))
   }
 
   if (!is.null(max.distance) && !"start" %in% names(hits))
@@ -229,23 +236,28 @@ motif_coocc <- function(motifs, sequences = NULL,
   g_pos <- g_seq <- NULL
   if (!is.null(max.distance)) {
     max.distance <- as.numeric(max.distance)
-    minstart <- as.numeric(min(hits$start))
-    rng <- as.numeric(max(hits$start)) - minstart
-    BIG <- 2 * rng + 1
     g_pos <- vector("list", n.motifs)   # global coords, sorted ascending
     g_seq <- vector("list", n.motifs)   # matching sequence ids
-    for (i in seq_len(n.motifs)) {
-      sub <- hits[hits$motif.i == i, , drop = FALSE]
-      if (nrow(sub) > 0L) {
-        g <- as.numeric(sub$sequence.i) * BIG +
-             (as.numeric(sub$start) - minstart)
-        o <- order(g)
-        g_pos[[i]] <- g[o]
-        g_seq[[i]] <- as.integer(sub$sequence.i)[o]
-      } else {
-        g_pos[[i]] <- numeric(0)
-        g_seq[[i]] <- integer(0)
+    if (nrow(hits) > 0L) {
+      minstart <- as.numeric(min(hits$start))
+      rng <- as.numeric(max(hits$start)) - minstart
+      BIG <- 2 * rng + 1
+      for (i in seq_len(n.motifs)) {
+        sub <- hits[hits$motif.i == i, , drop = FALSE]
+        if (nrow(sub) > 0L) {
+          g <- as.numeric(sub$sequence.i) * BIG +
+               (as.numeric(sub$start) - minstart)
+          o <- order(g)
+          g_pos[[i]] <- g[o]
+          g_seq[[i]] <- as.integer(sub$sequence.i)[o]
+        } else {
+          g_pos[[i]] <- numeric(0)
+          g_seq[[i]] <- integer(0)
+        }
       }
+    } else {
+      g_pos[] <- list(numeric(0))
+      g_seq[] <- list(integer(0))
     }
   }
 
@@ -292,7 +304,9 @@ motif_coocc <- function(motifs, sequences = NULL,
   a_only_v  <- cnt[i_idx] - both_v
   b_only_v  <- cnt[j_idx] - both_v
   neither_v <- n.sequences - a_only_v - b_only_v - both_v
-  neither_v[neither_v < 0L] <- 0L          # numerical guard
+  if (any(neither_v < 0L))
+    stop("internal error: contingency counts exceed `n.sequences`",
+         call. = FALSE)
 
   out <- data.frame(
     motif_a    = mot.names[i_idx],
@@ -314,7 +328,7 @@ motif_coocc <- function(motifs, sequences = NULL,
   ## p-value in a single call. With an all-integer table (the default
   ## pseudocount = 0) this matches fisher.test() to floating-point
   ## precision.
-  pc <- as.numeric(pseudocount)
+  pc <- as.integer(pseudocount)
   a  <- out$both    + pc        # top-left cell: sequences with both motifs
   b  <- out$a_only  + pc
   cc <- out$b_only  + pc
@@ -402,7 +416,7 @@ motif_coocc <- function(motifs, sequences = NULL,
 
 ## Coerce a hit table (data.frame or GRanges) into a data.frame with
 ## integer `motif.i`, `sequence.i`, and (if needed) `start`.
-coerce_hits <- function(hits, motifs, mot.names, need.start) {
+coerce_hits <- function(hits, motifs, mot.names, n.sequences, need.start) {
   if (inherits(hits, "GRanges")) {
     mc <- as.data.frame(S4Vectors::mcols(hits))
     if (!"start" %in% names(mc)) mc$start <- BiocGenerics::start(hits)
@@ -420,19 +434,35 @@ coerce_hits <- function(hits, motifs, mot.names, need.start) {
     else
       stop("`hits` must contain a `motif.i` or `motif` column",
            call. = FALSE)
-  } else if (is.character(hits$motif.i)) {
-    hits$motif.i <- match(hits$motif.i, mot.names)
+  } else if (is.character(hits$motif.i) || is.factor(hits$motif.i)) {
+    hits$motif.i <- match(as.character(hits$motif.i), mot.names)
   }
-  if (any(is.na(hits$motif.i)))
+  if (!is.numeric(hits$motif.i) || anyNA(hits$motif.i) ||
+      any(!is.finite(hits$motif.i)) ||
+      any(hits$motif.i != floor(hits$motif.i)))
     stop("some entries in `hits$motif.i` could not be matched to ",
          "`motifs` -- check names and indices", call. = FALSE)
+  if (!is.numeric(hits$sequence.i) || anyNA(hits$sequence.i) ||
+      any(!is.finite(hits$sequence.i)) ||
+      any(hits$sequence.i != floor(hits$sequence.i)))
+    stop("`hits$sequence.i` must contain finite integer indices",
+         call. = FALSE)
   hits$motif.i    <- as.integer(hits$motif.i)
   hits$sequence.i <- as.integer(hits$sequence.i)
-  if (max(hits$motif.i) > length(motifs))
-    stop("`hits` references motif indices beyond length(motifs)",
+  if (any(hits$motif.i < 1L | hits$motif.i > length(motifs)))
+    stop("`hits` references motif indices outside `1:length(motifs)`",
+         call. = FALSE)
+  if (any(hits$sequence.i < 1L | hits$sequence.i > n.sequences))
+    stop("`hits` references sequence indices outside `1:n.sequences`",
          call. = FALSE)
   if (need.start && !"start" %in% names(hits))
     stop("`hits` must contain a `start` column for spatial mode",
+         call. = FALSE)
+  if (need.start &&
+      (!is.numeric(hits$start) || anyNA(hits$start) ||
+       any(!is.finite(hits$start)) || any(hits$start < 1) ||
+       any(hits$start != floor(hits$start))))
+    stop("`hits$start` must contain positive finite integer coordinates",
          call. = FALSE)
   hits
 }

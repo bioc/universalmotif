@@ -41,3 +41,14 @@ test_that("viewing motif stacks works", {
   expect_is(r, "gg")
 
 })
+
+test_that("all motifs must contain the requested multifreq matrix", {
+  train <- Biostrings::DNAStringSet(rep("ACGTA", 20))
+  m2 <- suppressMessages(create_motif(train, add.multifreq = 2,
+                                      pseudocount = 1))
+  m3 <- suppressMessages(create_motif(train, add.multifreq = 3,
+                                      pseudocount = 1))
+  expect_error(view_motifs(list(m2, m3), use.freq = 2),
+               "not all motifs have corresponding multifreq matrix",
+               fixed = TRUE)
+})

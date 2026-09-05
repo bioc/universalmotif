@@ -211,6 +211,8 @@ motif_pvalue <- function(motifs, score, pvalue, bkg.probs, use.freq = 1,
   #       R> 0.0001942^3
   #       [1] 7.325e-12
 
+  method <- match.arg(method)
+
   # param check --------------------------------------------
   args <- as.list(environment())
   num_check <- check_fun_params(list( use.freq = args$use.freq, k = args$k,
@@ -251,7 +253,6 @@ motif_pvalue <- function(motifs, score, pvalue, bkg.probs, use.freq = 1,
 
   nthreads <- resolve_nthreads(nthreads)
 
-  method <- match.arg(method)
   if (method == "dynamic" && allow.nonfinite)
     stop(wmsg("`method = \"dynamic\"` and `allow.nonfinite = TRUE` are not compatible"),
       call. = FALSE)

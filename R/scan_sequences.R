@@ -310,7 +310,7 @@ scan_sequences <- function(motifs, sequences, threshold = 0.0001,
                           function(x) any(names(x@multifreq) %in%
                                           as.character(use.freq)),
                           logical(1))
-    if (!any(check_multi)) stop("not all motifs have correct multifreqs")
+    if (!all(check_multi)) stop("not all motifs have correct multifreqs")
   }
 
   if (use.freq == 1) {

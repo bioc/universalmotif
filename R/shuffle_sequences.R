@@ -118,9 +118,9 @@ shuffle_sequences <- function(sequences, k = 1, method = "euler",
   # param check --------------------------------------------
   args <- as.list(environment())
   all_checks <- character(0)
-  if (!method %in% c("markov", "linear", "random", "euler")) {
+  if (!method %in% c("markov", "linear", "euler")) {
     method_check <- paste0(" * Incorrect 'shuffle.method': expected `euler`, `markov`, ",
-                           "`linear` or `random`; got `",
+                           "or `linear`; got `",
                            method, "`")
     method_check <- wmsg2(method_check)
     all_checks <- c(all_checks, method_check)
