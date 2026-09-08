@@ -334,6 +334,38 @@ MINOR CHANGES
 
 BUG FIXES
 
+  o Fixed scan_sequences() reporting truncated stop coordinates and
+    matched sequences for higher-order motifs (use.freq > 1). Hits and
+    the short-sequence check now use the full nucleotide span.
+
+  o Fixed scan_sequences(), view_motifs(), and view_motifs_lite()
+    accepting motif lists in which only some motifs contained the
+    requested multifreq matrix. Every motif is now checked before
+    scanning or plotting.
+
+  o Fixed motif_pvalue() rejecting use.freq > 3 when method was omitted.
+    The default dynamic method is now resolved before validation.
+
+  o Fixed motif_coocc() accepting fractional pseudocounts for its
+    Fisher's exact test. Pseudocounts must now be finite, non-negative
+    whole numbers.
+
+  o Fixed motif_coocc() accepting invalid precomputed hit indices and
+    silently clamping inconsistent contingency counts. Motif and
+    sequence indices are now checked against their bounds, and integer
+    parameters and spatial coordinates receive stricter validation.
+
+  o Fixed motif_coocc() emitting warnings for empty hit tables in
+    spatial mode. These now return zero co-occurrence counts and NA
+    median distances without warnings.
+
+  o Fixed shuffle_sequences() accepting the unsupported method =
+    "random". It now reports the supported methods in a clear error.
+
+  o Fixed scan_sequences_lite(return.granges = TRUE) dropping metadata
+    columns when no hits were found. Empty results now retain the
+    documented metadata columns.
+
   o Fixed get_consensus() and get_consensusAA() crashing the R session
     when passed something other than a single numeric motif column, such
     as a whole universalmotif object or a vector shorter than the
