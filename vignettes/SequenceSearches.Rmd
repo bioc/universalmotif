@@ -1043,7 +1043,7 @@ Now these sequences could be used directly with `scan_sequences()` or written to
 
 # Motif discovery with MEME
 
-_Note: In the time since the inception of the `run_meme()` function, Spencer Nystrom (a contributor to `universalmotif`) has created the `memes` package as an interface to much of the `MEME` suite. It is fully interoperable with the `universalmotif` package and provides a much more convenient way to run `MEME` programs from within `R`. Install it from Bioconductor with `BiocManager::install("memes")`._
+_Note: In the time since the inception of the `run_meme()` function, Sabrina Nystrom (a contributor to `universalmotif`) has created the `memes` package as an interface to much of the `MEME` suite. It is fully interoperable with the `universalmotif` package and provides a much more convenient way to run `MEME` programs from within `R`. Install it from Bioconductor with `BiocManager::install("memes")`._
 
 The `universalmotif` package provides a simple wrapper to the powerful motif discovery tool `MEME` [@meme3]. To run an analysis with `MEME`, all that is required is a set of `XStringSet` class sequences (defined in the `Biostrings` package), and `run_meme()` will take care of running the program and reading the output for use within `R`.
 

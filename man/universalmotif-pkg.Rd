@@ -21,7 +21,7 @@ Useful links:
 
 Other contributors:
 \itemize{
-  \item Spencer Nystrom (\href{https://orcid.org/0000-0003-1000-1579}{ORCID}) [contributor]
+  \item Sabrina Nystrom (\href{https://orcid.org/0000-0003-1000-1579}{ORCID}) [contributor]
 }
 
 }
