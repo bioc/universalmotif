@@ -734,7 +734,7 @@ BUG FIXES
 
     o read_meme(): Handle motif files with custom alphabets and no 'END'
       line in alphabet definition. Thanks to @manoloff (#24) for the bug
-      report, and Spencer Nystrom for the fix (#25).
+      report, and Sabrina Nystrom for the fix (#25).
 
 CHANGES IN VERSION 1.14.0
 -------------------------
@@ -1153,7 +1153,7 @@ CHANGES IN VERSION 1.6.1
 BUG FIXES
 
     o summarise_motif(): properly retrieves altname slot. Contribution from
-      Spencer Nystrom (https://github.com/bjmt/universalmotif/pull/9).
+      Sabrina Nystrom (https://github.com/bjmt/universalmotif/pull/9).
 
     o read_meme(): for LIKE type alphabets, make sure PROTEIN-LIKE is
       understood as being AA.
@@ -1199,7 +1199,7 @@ MINOR CHANGES
 
     o read_meme(): now supports DNA-LIKE, RNA-LIKE, and AA-LIKE alphabets,
       though these will be treated as regular DNA, RNA, and AA alphabets,
-      respectively. Contribution from Spencer Nystrom
+      respectively. Contribution from Sabrina Nystrom
       (https://github.com/bjmt/universalmotif/pull/7).
 
     o Some cleanup to documentation and vignettes.
@@ -1209,7 +1209,7 @@ MINOR CHANGES
 BUG FIXES
 
     o write_meme() now includes altname slot if filled. Contribution from
-      Spencer Nystrom (https://github.com/bjmt/universalmotif/pull/5).
+      Sabrina Nystrom (https://github.com/bjmt/universalmotif/pull/5).
 
     o write_meme() checks for and removes any spaces/equal signs in motif
       names/altnames.
