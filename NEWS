@@ -152,6 +152,9 @@ NEW FEATURES
     plot_score_distribution() for scan, enrichment, co-occurrence and
     score distribution results.
 
+  o Added mask_complexity(), which masks low-complexity regions with
+    symmetric DUST (as in dustmasker), and soft-masked letters if asked.
+
 MINOR CHANGES
 
   o ggplot2 >= 4.0.0 is now required.
