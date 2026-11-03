@@ -93,6 +93,14 @@ count_klets_alph_cpp <- function(sequences, alph, k, nthreads) {
     .Call('_universalmotif_count_klets_alph_cpp', PACKAGE = 'universalmotif', sequences, alph, k, nthreads)
 }
 
+dust_intervals_cpp <- function(seqs, window, threshold, lowercase, nthreads) {
+    .Call('_universalmotif_dust_intervals_cpp', PACKAGE = 'universalmotif', seqs, window, threshold, lowercase, nthreads)
+}
+
+mask_complexity_cpp <- function(seqs, window, threshold, lowercase, letter, nthreads) {
+    .Call('_universalmotif_mask_complexity_cpp', PACKAGE = 'universalmotif', seqs, window, threshold, lowercase, letter, nthreads)
+}
+
 motif_finder_cpp <- function(pos_seqs, neg_seqs, min_w, max_w, nmotifs, hit_pvalue, stop_pvalue, dedup_overlap, RC, bkg_in, pseudocount, nthreads) {
     .Call('_universalmotif_motif_finder_cpp', PACKAGE = 'universalmotif', pos_seqs, neg_seqs, min_w, max_w, nmotifs, hit_pvalue, stop_pvalue, dedup_overlap, RC, bkg_in, pseudocount, nthreads)
 }

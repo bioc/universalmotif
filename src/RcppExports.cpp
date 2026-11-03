@@ -367,6 +367,35 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// dust_intervals_cpp
+Rcpp::List dust_intervals_cpp(const std::vector<std::string>& seqs, const int window, const int threshold, const bool lowercase, const int nthreads);
+RcppExport SEXP _universalmotif_dust_intervals_cpp(SEXP seqsSEXP, SEXP windowSEXP, SEXP thresholdSEXP, SEXP lowercaseSEXP, SEXP nthreadsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< const std::vector<std::string>& >::type seqs(seqsSEXP);
+    Rcpp::traits::input_parameter< const int >::type window(windowSEXP);
+    Rcpp::traits::input_parameter< const int >::type threshold(thresholdSEXP);
+    Rcpp::traits::input_parameter< const bool >::type lowercase(lowercaseSEXP);
+    Rcpp::traits::input_parameter< const int >::type nthreads(nthreadsSEXP);
+    rcpp_result_gen = Rcpp::wrap(dust_intervals_cpp(seqs, window, threshold, lowercase, nthreads));
+    return rcpp_result_gen;
+END_RCPP
+}
+// mask_complexity_cpp
+std::vector<std::string> mask_complexity_cpp(std::vector<std::string> seqs, const int window, const int threshold, const bool lowercase, const std::string& letter, const int nthreads);
+RcppExport SEXP _universalmotif_mask_complexity_cpp(SEXP seqsSEXP, SEXP windowSEXP, SEXP thresholdSEXP, SEXP lowercaseSEXP, SEXP letterSEXP, SEXP nthreadsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< std::vector<std::string> >::type seqs(seqsSEXP);
+    Rcpp::traits::input_parameter< const int >::type window(windowSEXP);
+    Rcpp::traits::input_parameter< const int >::type threshold(thresholdSEXP);
+    Rcpp::traits::input_parameter< const bool >::type lowercase(lowercaseSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type letter(letterSEXP);
+    Rcpp::traits::input_parameter< const int >::type nthreads(nthreadsSEXP);
+    rcpp_result_gen = Rcpp::wrap(mask_complexity_cpp(seqs, window, threshold, lowercase, letter, nthreads));
+    return rcpp_result_gen;
+END_RCPP
+}
 // motif_finder_cpp
 Rcpp::List motif_finder_cpp(const std::vector<std::string>& pos_seqs, const std::vector<std::string>& neg_seqs, int min_w, int max_w, int nmotifs, double hit_pvalue, double stop_pvalue, double dedup_overlap, bool RC, Rcpp::NumericVector bkg_in, int pseudocount, int nthreads);
 RcppExport SEXP _universalmotif_motif_finder_cpp(SEXP pos_seqsSEXP, SEXP neg_seqsSEXP, SEXP min_wSEXP, SEXP max_wSEXP, SEXP nmotifsSEXP, SEXP hit_pvalueSEXP, SEXP stop_pvalueSEXP, SEXP dedup_overlapSEXP, SEXP RCSEXP, SEXP bkg_inSEXP, SEXP pseudocountSEXP, SEXP nthreadsSEXP) {
@@ -1082,6 +1111,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_universalmotif_compare_motifs_lite_consensus_cpp", (DL_FUNC) &_universalmotif_compare_motifs_lite_consensus_cpp, 5},
     {"_universalmotif_dedup_hits_cpp", (DL_FUNC) &_universalmotif_dedup_hits_cpp, 8},
     {"_universalmotif_count_klets_alph_cpp", (DL_FUNC) &_universalmotif_count_klets_alph_cpp, 4},
+    {"_universalmotif_dust_intervals_cpp", (DL_FUNC) &_universalmotif_dust_intervals_cpp, 5},
+    {"_universalmotif_mask_complexity_cpp", (DL_FUNC) &_universalmotif_mask_complexity_cpp, 6},
     {"_universalmotif_motif_finder_cpp", (DL_FUNC) &_universalmotif_motif_finder_cpp, 12},
     {"_universalmotif_motif_pvalue_cpp", (DL_FUNC) &_universalmotif_motif_pvalue_cpp, 6},
     {"_universalmotif_motif_score_cpp", (DL_FUNC) &_universalmotif_motif_score_cpp, 7},
