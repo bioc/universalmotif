@@ -51,7 +51,7 @@ test_that("motif creation from matrix input works", {
 
   mat3 <- motif4["motif"]
 
-  expect_warning(motif5 <- create_motif(mat3), "negative values")
+  expect_warning(motif5 <- create_motif(mat3), "negative\\s+values")
   motif5["nsites"] <- 10
   motif6 <- create_motif(mat2, alphabet = "QWER", type = "PCM")
 
@@ -113,7 +113,7 @@ test_that("motif creation from character input works", {
 test_that("create_motif handles single columns, custom letters and 20 rows", {
   m <- create_motif(matrix(c(.1, .2, .3, .4), 4, dimnames = list(DNA_BASES, NULL)))
   expect_equal(ncol(m@motif), 1)
-  expect_error(create_motif(c("ABCD", "ABCX"), alphabet = "ABCD"), "not in the alphabet")
+  expect_error(create_motif(c("ABCD", "ABCX"), alphabet = "ABCD"), "not\\s+in\\s+the\\s+alphabet")
   x <- matrix(1 / 20, 20, 3, dimnames = list(LETTERS[1:20], NULL))
   expect_equal(create_motif(x)@alphabet, "ABCDEFGHIJKLMNOPQRST")
   rownames(x) <- AA_STANDARD2

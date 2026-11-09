@@ -63,7 +63,7 @@ test_that("seeded shuffle is reproducible at nthreads = 2", {
 test_that("removed random shuffle method is rejected", {
   seqs <- Biostrings::DNAStringSet("ACGTACGT")
   expect_error(shuffle_sequences(seqs, method = "random", k = 2),
-               "Incorrect 'shuffle.method'", fixed = TRUE)
+               "Incorrect\\s+'shuffle\\.method'")
 })
 
 test_that("markov shuffling and sequence creation follow the last letters", {

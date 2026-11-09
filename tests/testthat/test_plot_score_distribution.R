@@ -131,7 +131,7 @@ test_that("several cutoffs are drawn", {
 test_that("an unreachable cutoff warns and is skipped", {
   m <- create_motif("TGACT", pseudocount = 1, name = "short")
   expect_warning(p <- plot_score_distribution(m, pvalues = c(1e-2, 1e-9)),
-    "cannot reach a P-value of 1e-9")
+    "cannot\\s+reach\\s+a\\s+P-value\\s+of\\s+1e-9")
   cut <- ggplot2::layer_data(p, geom_layer(p, "GeomVline"))
   expect_equal(cut$xintercept, motif_pvalue(m, pvalue = 1e-2))
 })
@@ -224,15 +224,15 @@ test_that("bad input is refused", {
   for (bad in list(0, 1.5, c(1e-4, -1), "a"))
     expect_error(plot_score_distribution(m, pvalues = bad), "pvalues")
   expect_error(plot_score_distribution(list(m, m, m),
-    bkg.probs = list(rep(0.25, 4), rep(0.25, 4))), "one per motif")
+    bkg.probs = list(rep(0.25, 4), rep(0.25, 4))), "one\\s+per\\s+motif")
   expect_error(plot_score_distribution(m,
     hits = data.frame(motif = m@name)), "score")
   expect_error(plot_score_distribution(list(m, m),
     hits = data.frame(score = 1)), "motif")
   expect_error(plot_score_distribution(list(m, m), hits = c(1, 2)),
-    "several motifs")
+    "several\\s+motifs")
   expect_error(plot_score_distribution(m, hits = list(`G-box` = 1)),
-    "not plotted: G-box")
+    "not\\s+plotted:\\s+G-box")
   expect_error(plot_score_distribution(m, log.y = NA), "log.y")
 })
 

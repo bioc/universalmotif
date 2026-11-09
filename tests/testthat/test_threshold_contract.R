@@ -38,7 +38,7 @@ test_that("get_matches accepts unattainable P-value thresholds", {
   expect_lte(motif_pvalue(examplemotif, score = cutoff), 0.001)
   # Ordinary invalid finite scores still receive the existing range error.
   expect_error(get_matches(examplemotif, max(get_scores(examplemotif)) + 1),
-               "greater than max possible score")
+               "greater\\s+than\\s+max\\s+possible\\s+score")
 })
 
 test_that("dynamic score queries respect inclusive decimal boundaries", {

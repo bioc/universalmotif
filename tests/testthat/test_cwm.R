@@ -118,7 +118,7 @@ test_that("CWMs have no total IC until converted", {
 
 test_that("matrices with negative values and no type give a warning", {
   m <- matrix(c(-1, .5, .2, .3, 1, -1, 0, 0), 4, dimnames = list(DNA_BASES, NULL))
-  expect_warning(create_motif(m), "negative values")
+  expect_warning(create_motif(m), "negative\\s+values")
   expect_silent(create_motif(m, type = "PWM"))
   expect_silent(create_motif(m, type = "CWM"))
 })
