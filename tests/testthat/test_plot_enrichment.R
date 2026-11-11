@@ -22,7 +22,7 @@ layer_of <- function(p, geom) {
 
 label_data <- function(p) {
   d <- layer_of(p, "GeomEnrichLabels")
-  if (is.null(d)) return(character(0))
+  if (is.null(d)) return(data.frame())
   d[!is.na(d$label), , drop = FALSE]
 }
 
@@ -30,7 +30,9 @@ find_grobs <- function(g, cls) {
   if (inherits(g, cls)) return(list(g))
   kids <- if (inherits(g, "gtable")) g$grobs
     else if (inherits(g, "gTree")) g$children else list()
-  unlist(lapply(kids, find_grobs, cls), recursive = FALSE)
+  out <- list()
+  for (k in kids) out <- c(out, find_grobs(k, cls))
+  out
 }
 
 ## Place the labels of a plot in a panel of the given size (in points) and
@@ -38,7 +40,11 @@ find_grobs <- function(g, cls) {
 drawn_labels <- function(p, width = 400, height = 300) {
   grDevices::pdf(NULL)
   on.exit(grDevices::dev.off())
-  lab <- find_grobs(ggplot2::ggplotGrob(p), "um_enrich_labels")[[1]]
+  ## A plot with no labels has no label grob, and nothing is drawn.
+  labs <- find_grobs(ggplot2::ggplotGrob(p), "um_enrich_labels")
+  if (!length(labs)) return(list(kids = list(), type = character(0),
+    boxes = list()))
+  lab <- labs[[1]]
   grid::pushViewport(grid::viewport(width = grid::unit(width, "pt"),
     height = grid::unit(height, "pt")))
   kids <- makeContent.um_enrich_labels(lab)$children
@@ -275,9 +281,15 @@ test_that("enrich_motifs_lite() results can be plotted", {
   bkg <- shuffle_sequences(ArabidopsisPromoters, k = 2, rng.seed = 1)
   res <- enrich_motifs_lite(motifs, ArabidopsisPromoters, bkg,
     pvalue = 1e-3, qvalue = 1, nthreads = 1)
-  p <- plot_enrichment(res, labels = 2, motifs = motifs)
+  ## The background is shuffled, which differs between platforms, so the
+  ## labels are chosen by name rather than by significance.
+  p <- plot_enrichment(res, labels = c("W-box", "G-box"), motifs = motifs)
   expect_s3_class(p, "ggplot")
   expect_no_error(ggplot2::ggplot_build(p))
   out <- drawn_labels(p)
+  expect_equal(sum(out$type == "text"), 2)
   expect_equal(sum(out$type == "text"), nrow(label_data(p)))
+  ## Whatever is significant, numbered labels draw without error.
+  out <- drawn_labels(plot_enrichment(res, labels = 2, motifs = motifs))
+  expect_true(sum(out$type == "text") <= 2)
 })
